@@ -1,0 +1,26 @@
+name: Sync Upstream
+
+on:
+  # 매일 정오(한국 시간 기준 오후 9시 / UTC 12:00)마다 자동으로 실행
+  schedule:
+    - cron: '0 12 * * *'
+  # Actions 탭에서 수동으로 실행 가능
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # 코드 커밋 및 푸시 권한 부여
+
+    steps:
+      - name: Checkout target repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # 전체 히스토리를 가져와야 동기화가 원활합니다.
+
+      - name: Sync with Upstream
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh repo sync ${{ github.repository }} -b main --source seerge/g-helper
